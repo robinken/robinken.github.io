@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"robinken.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="项目源码文件太多？来试试 Mylyn 吧。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mylyn 介绍">
+<meta property="og:url" content="https://robinken.github.io/2021/03/27/mylyn-intro/index.html">
+<meta property="og:site_name" content="robinken&#39;s blog">
+<meta property="og:description" content="项目源码文件太多？来试试 Mylyn 吧。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://wiki.eclipse.org/images/e/ed/Feature-Guide-3.0-Package-Explorer-Focused.png">
+<meta property="og:image" content="https://wiki.eclipse.org/images/8/8b/Feature-Reference-3.0-Task-List-Tooltip.png">
+<meta property="og:image" content="https://wiki.eclipse.org/images/1/1c/Feature-Reference-3.0-Add-Task-Repository.png">
+<meta property="article:published_time" content="2021-03-27T07:35:10.000Z">
+<meta property="article:modified_time" content="2021-04-02T03:03:16.426Z">
+<meta property="article:author" content="robinken">
+<meta property="article:tag" content="工具">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://wiki.eclipse.org/images/e/ed/Feature-Guide-3.0-Package-Explorer-Focused.png">
+
+<link rel="canonical" href="https://robinken.github.io/2021/03/27/mylyn-intro/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Mylyn 介绍 | robinken's blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">robinken's blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">honki dasu</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://robinken.github.io/2021/03/27/mylyn-intro/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="robinken">
+      <meta itemprop="description" content="honki dasu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="robinken's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mylyn 介绍
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-27 15:35:10" itemprop="dateCreated datePublished" datetime="2021-03-27T15:35:10+08:00">2021-03-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-02 11:03:16" itemprop="dateModified" datetime="2021-04-02T11:03:16+08:00">2021-04-02</time>
+              </span>
+
+          
+            <div class="post-description">项目源码文件太多？来试试 Mylyn 吧。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>之前有一段时间参与开发过一个估计有 20 年寿命的系统，典型的单体架构巨无霸应用，代码里充满了历史感，槽点很多，此处先按下不表。</p>
+<!--jdk版本1.5；开发主要是写jsp，自然没有前后端分离；因为逻辑堆太多，以至于几个远古jsp超过了 65535 字节的编译限制；用到一些特有的API，所以只能在ie8上使用；版本管理使用SVN，但是使用的方式很奇怪，只有两个branch，在开发分支上写新功能，之后需要手动把新的代码拷贝到验证分支上；同时有几十号人在一个代码分支上开发，所以有时候就会出现冲突问题；文档也相当缺乏，基本上是有经验的人告诉你要实现这个功能可以参考哪个jsp； -->
+
+<p>持续多年的开发积累了数量庞大的源文件，想要在数千个文件里定位到需要的东西，就算熟练使用 ctrl+shift+r （Eclipse 快捷键）搜索功能，开发体验依然非常糟糕。忘了是什么契机，接触到了 Mylyn，有效缓解了开发过程中因为文件太多带来的困扰，所以写点东西来记录一下。</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>按照<a target="_blank" rel="noopener" href="https://www.eclipse.org/mylyn/">官网</a>的说法，Mylyn 是 Eclipse 的任务和应用程序生命周期管理（ALM）框架。它提供了：</p>
+<ul>
+<li>革命性的以任务为中心的界面（task-focused interface）</li>
+<li>开发人员的任务管理工具</li>
+<li>集成敏捷开发和 ALM 的广阔生态系统</li>
+</ul>
+<p>这个名字据说来源于 myelin，意思是<strong>髓鞘</strong>，这是包裹在神经细胞轴突外面的一层结构，可以提高信号在神经中传播的效率，正如这个插件可以提高开发人员的效率。</p>
+<p>虽然 Mylyn 的功能很多，不过在这里只简单介绍一下我使用到的部分——以任务为中心的界面。</p>
+<p>一个项目里也许有成百上千个源文件，但当需要添加一个新功能或者修复一个 bug 的时候，一般只有若干个文件会被使用。此时其他无关的内容就成了视觉上的累赘，造成信息过载，分散我们的注意力。Mylyn 提供了一个机制，可以通过任务（Task）和上下文（Context）来管理相关的内容。</p>
+<p>当创建任务并激活后，它会自动把用户操作记录到任务上下文中。接下来在 Eclipse 的资源管理器上点击图标为三个小球的按钮（Focus On Active Task），就会得到一个干净的目录，里面只有和这次任务相关的资源。对于 Java 类，过滤粒度甚至可以小到方法的级别。Mylyn 和 Eclipse 深度集成，在很多面板上都可以发现这个按钮，提供类似的信息过滤效果。</p>
+<p><img src="https://wiki.eclipse.org/images/e/ed/Feature-Guide-3.0-Package-Explorer-Focused.png" alt="资源管理器任务聚焦"></p>
+<p>通过创建多个任务，并激活不同的任务来切换上下文，就算同时修十个 bug，也能方便地管理，不至于在文件海中迷失方向。还可以为任务安排时间表和设定紧急程度。</p>
+<p><img src="https://wiki.eclipse.org/images/8/8b/Feature-Reference-3.0-Task-List-Tooltip.png" alt="任务列表"></p>
+<p>任务除了在本地使用，还可以存储到远程仓库，或者和 Jira 这类项目管理工具集成，共享给整个团队，这样其他人就能方便地了解某个功能有哪些相关的文件，或者某个bug需要修改哪些文件，可以快速掌握任务内容，接手开发。</p>
+<p><img src="https://wiki.eclipse.org/images/1/1c/Feature-Reference-3.0-Add-Task-Repository.png" alt="任务仓库"></p>
+<p>这里就只介绍 Mylyn 的冰山一角，具体的使用方法和更多的功能可以看官方的<a target="_blank" rel="noopener" href="https://wiki.eclipse.org/Mylyn/User_Guide">用户手册</a>，十分详细并且图文并茂（上面的图都是从那里拿的），有兴趣的话非常推荐阅读👍。</p>
+<h2 id="其他-IDE-上的类似功能"><a href="#其他-IDE-上的类似功能" class="headerlink" title="其他 IDE 上的类似功能"></a>其他 IDE 上的类似功能</h2><p>Mylyn 虽然很强大，但它是集成在 Eclipse 上的，而 Eclipse 并不是我的主力开发工具，那么其他 IDE 上有没有类似的东西呢？这里就写一下我个人比较常用的几个的情况。</p>
+<h3 id="IntelliJ-IDEA"><a href="#IntelliJ-IDEA" class="headerlink" title="IntelliJ IDEA"></a>IntelliJ IDEA</h3><p>参考<a target="_blank" rel="noopener" href="https://www.jetbrains.com/help/idea/managing-tasks-and-context.html">官方文档</a>对相关功能的介绍。</p>
+<p><strong>task</strong></p>
+<blockquote>
+<p>When you work on a project, you can organize your work in smaller tasks that you need to complete.</p>
+<p>These can be tasks that you set yourself. In IntelliJ IDEA, you can divide a large piece of work into smaller tasks and associate them with changelists.</p>
+</blockquote>
+<p><strong>context</strong></p>
+<blockquote>
+<p>A context is a set of bookmarks, breakpoints, and tabs opened in the editor. Contexts are linked to tasks, but you can work with contexts without associating them with specific tasks.</p>
+</blockquote>
+<p>任务和上下文的概念和 Mylyn 基本是一致的，使用的入口在 Tools -&gt; Tasks &amp; Contexts 菜单下。我在使用之后，发现没有自动记录的功能，也没有类似资源管理器过滤的功能，只能记录当时打开的编辑器标签页，当然 Mylyn 一样可以做到这一点。就个人的使用体验而言，我想要的功能都没有……</p>
+<h3 id="Visual-Studio-Code"><a href="#Visual-Studio-Code" class="headerlink" title="Visual Studio Code"></a>Visual Studio Code</h3><p>vscode 毕竟定位是编辑器，本身是没有这种功能的，不过它有一个活跃的插件市场，自然会有人开发类似的插件。使用 context 作为关键字进行检索就可以找到很多，这里随便列出几个：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=jsaulou.tasks-context">Tasks context</a></li>
+<li><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=choppedcode.tasks-and-contexts">Tasks And Contexts</a></li>
+<li><a target="_blank" rel="noopener" href="https://marketplace.visualstudio.com/items?itemName=marlom.keep-context">Keep Context</a></li>
+<li>……</li>
+</ul>
+<p>功能都比较有限，有需求的读者可以自行尝试。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>robinken
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://robinken.github.io/2021/03/27/mylyn-intro/" title="Mylyn 介绍">https://robinken.github.io/2021/03/27/mylyn-intro/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag"># 工具</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/19/first-post/" rel="prev" title="第一篇文章">
+      <i class="fa fa-chevron-left"></i> 第一篇文章
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96-IDE-%E4%B8%8A%E7%9A%84%E7%B1%BB%E4%BC%BC%E5%8A%9F%E8%83%BD"><span class="nav-number">3.</span> <span class="nav-text">其他 IDE 上的类似功能</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#IntelliJ-IDEA"><span class="nav-number">3.1.</span> <span class="nav-text">IntelliJ IDEA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Visual-Studio-Code"><span class="nav-number">3.2.</span> <span class="nav-text">Visual Studio Code</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">robinken</p>
+  <div class="site-description" itemprop="description">honki dasu</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">robinken</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
